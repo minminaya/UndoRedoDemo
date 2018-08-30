@@ -1,20 +1,26 @@
 package com.minminaya.demo;
 
-/**
- * 撤销删除环型双向链表实现
- *
- * @author LiGuangMin
- * @email lgm@meitu.com
- * @time Created by 2018/8/29 18:47
- */
-public class UndoRedoManager<T> {
-    // 头结点
-    private Node mHead;
-    // 尾结点
-    private Node mTail;
+
+public class UndoRedoLinkList<T> {
+    //头结点
+    private UndoRedoLinkList mHead;
+    //尾结点
+    private UndoRedoLinkList mTail;
     // 当前的显示的节点
-    private Node mCurrentNode;
+    private UndoRedoLinkList mCurrentNode;
     private int mCount = 5;
+
+    //业务的数据
+    private T mData;
+    private UndoRedoLinkList mPrevious;
+    private UndoRedoLinkList mNext;
+
+    /**
+     * @param data 管理类只需要传入null
+     */
+    public UndoRedoLinkList(T data) {
+        mData = data;
+    }
 
     /**
      * 设置可以缓存的最大数量
@@ -29,11 +35,11 @@ public class UndoRedoManager<T> {
         deleteAfterNode(mCurrentNode);
         if (size() >= mCount) {
             insertInTail(data);
-            // 当前的头部前移
+            //当前的头部前移
             replaceCurrentHead();
             return;
         }
-        // 执行插入
+        //执行插入
         insertInTail(data);
     }
 
@@ -78,7 +84,7 @@ public class UndoRedoManager<T> {
         // 尾部有值的情况
         int size = 1;
         // 如果尾部有值，那么开始遍历每一个项
-        Node cur = mTail;
+        UndoRedoLinkList cur = mTail;
         while (cur != mTail.mNext) {
             size++;
             cur = cur.mPrevious;
@@ -92,7 +98,7 @@ public class UndoRedoManager<T> {
      * @param data
      */
     private void insertInTail(T data) {
-        Node newNode = new Node(data);
+        UndoRedoLinkList newNode = new UndoRedoLinkList<>(data);
         // 保存为当前的节点
         this.mCurrentNode = newNode;
         if (mTail == null) {
@@ -100,7 +106,7 @@ public class UndoRedoManager<T> {
             mHead = newNode;
             mTail = newNode;
 
-            // 和头部相连接，形成环形双向链表
+            //和头部相连接，形成环形双向链表
             mTail.mNext = mHead;
             mHead.mPrevious = mTail;
         } else {
@@ -108,7 +114,7 @@ public class UndoRedoManager<T> {
             mTail.mNext = newNode;
             mTail = newNode;
 
-            // 和头部相连接，形成环形双向链表
+            //和头部相连接，形成环形双向链表
             mTail.mNext = mHead;
             mHead.mPrevious = mTail;
         }
@@ -120,7 +126,7 @@ public class UndoRedoManager<T> {
      * @param node
      * @return
      */
-    private void deleteAfterNode(Node node) {
+    private void deleteAfterNode(UndoRedoLinkList node) {
         if (node == null) {
             return;
         }
@@ -136,22 +142,22 @@ public class UndoRedoManager<T> {
         }
         if (isLeftBound()) {
             // 如果是左边界
-            return mHead.mData;
+            return (T) mHead.mData;
         }
         mCurrentNode = mCurrentNode.mPrevious;
-        return mCurrentNode.mData;
+        return (T) mCurrentNode.mData;
     }
 
     private T getNextNode() {
-        if(mTail == null){
+        if (mTail == null) {
             return null;
         }
         if (isRightBound()) {
             // 如果是右边界
-            return mTail.mData;
+            return (T) mTail.mData;
         }
         mCurrentNode = mCurrentNode.mNext;
-        return mCurrentNode.mData;
+        return (T) mCurrentNode.mData;
     }
 
     /**
@@ -170,16 +176,5 @@ public class UndoRedoManager<T> {
      */
     public boolean isRightBound() {
         return mCurrentNode == mTail || mCurrentNode == null;
-    }
-
-    private class Node {
-        // 业务的数据
-        private T mData;
-        private Node mPrevious;
-        private Node mNext;
-
-        Node(T data) {
-            mData = data;
-        }
     }
 }

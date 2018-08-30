@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mPutBtn;
     private Button mRightBtn;
     private TextView mStateTv;
-    private UndoRedoManager<String> mUndoRedoManager;
+    private UndoRedoLinkList<String> mUndoRedoLinkList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,26 +35,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mLeftBtn.setOnClickListener(this);
         mPutBtn.setOnClickListener(this);
         mRightBtn.setOnClickListener(this);
-        mUndoRedoManager = new UndoRedoManager<>();
+        mUndoRedoLinkList = new UndoRedoLinkList<>(null);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_left: {
-                String str = mUndoRedoManager.undo();
+                String str = mUndoRedoLinkList.undo();
                 mStateTv.setText(str);
                 break;
             }
             case R.id.btn_right: {
-                String str = mUndoRedoManager.redo();
+                String str = mUndoRedoLinkList.redo();
                 mStateTv.setText(str);
                 break;
             }
             case R.id.btn_put: {
                 final String str = mInputEt.getText().toString();
                 mStateTv.setText(str);
-                mUndoRedoManager.put(str);
+                mUndoRedoLinkList.put(str);
                 Log.d(TAG, "btn_put: ");
                 break;
             }
