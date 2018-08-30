@@ -1,19 +1,27 @@
 package com.minminaya.demo;
 
-
+/**
+ * 撤销删除环型双向链表
+ * <p></p>
+ * T为要存储的数据
+ *
+ * @author LiGuangMin
+ * @email lgm@meitu.com
+ * @time Created by 2018/8/30 13:56
+ */
 public class UndoRedoLinkList<T> {
     //头结点
-    private UndoRedoLinkList mHead;
+    private UndoRedoLinkList<T> mHead;
     //尾结点
-    private UndoRedoLinkList mTail;
+    private UndoRedoLinkList<T> mTail;
     // 当前的显示的节点
-    private UndoRedoLinkList mCurrentNode;
+    private UndoRedoLinkList<T> mCurrentNode;
     private int mCount = 5;
 
     //业务的数据
     private T mData;
-    private UndoRedoLinkList mPrevious;
-    private UndoRedoLinkList mNext;
+    private UndoRedoLinkList<T> mPrevious;
+    private UndoRedoLinkList<T> mNext;
 
     /**
      * @param data 管理类只需要传入null
@@ -62,6 +70,26 @@ public class UndoRedoLinkList<T> {
     }
 
     /**
+     * 删除链表所有数据
+     */
+    public void removeAll() {
+        if (mHead == null) {
+            return;
+        }
+        UndoRedoLinkList<T> cur = mHead;
+        while (cur != mHead.mPrevious) {
+            UndoRedoLinkList<T> dest = cur;
+            cur = cur.mNext;
+
+            dest.mNext = null;
+            dest.mPrevious = null;
+        }
+        mHead = null;
+        mTail = null;
+        mCurrentNode = null;
+    }
+
+    /**
      * 当前的指针头部前移
      */
     private void replaceCurrentHead() {
@@ -84,7 +112,7 @@ public class UndoRedoLinkList<T> {
         // 尾部有值的情况
         int size = 1;
         // 如果尾部有值，那么开始遍历每一个项
-        UndoRedoLinkList cur = mTail;
+        UndoRedoLinkList<T> cur = mTail;
         while (cur != mTail.mNext) {
             size++;
             cur = cur.mPrevious;
@@ -98,7 +126,7 @@ public class UndoRedoLinkList<T> {
      * @param data
      */
     private void insertInTail(T data) {
-        UndoRedoLinkList newNode = new UndoRedoLinkList<>(data);
+        UndoRedoLinkList<T> newNode = new UndoRedoLinkList<>(data);
         // 保存为当前的节点
         this.mCurrentNode = newNode;
         if (mTail == null) {
@@ -126,7 +154,7 @@ public class UndoRedoLinkList<T> {
      * @param node
      * @return
      */
-    private void deleteAfterNode(UndoRedoLinkList node) {
+    private void deleteAfterNode(UndoRedoLinkList<T> node) {
         if (node == null) {
             return;
         }
@@ -142,10 +170,10 @@ public class UndoRedoLinkList<T> {
         }
         if (isLeftBound()) {
             // 如果是左边界
-            return (T) mHead.mData;
+            return mHead.mData;
         }
         mCurrentNode = mCurrentNode.mPrevious;
-        return (T) mCurrentNode.mData;
+        return mCurrentNode.mData;
     }
 
     private T getNextNode() {
@@ -154,10 +182,10 @@ public class UndoRedoLinkList<T> {
         }
         if (isRightBound()) {
             // 如果是右边界
-            return (T) mTail.mData;
+            return mTail.mData;
         }
         mCurrentNode = mCurrentNode.mNext;
-        return (T) mCurrentNode.mData;
+        return mCurrentNode.mData;
     }
 
     /**

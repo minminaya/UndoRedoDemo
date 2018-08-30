@@ -2,6 +2,8 @@ package com.minminaya.demo;
 
 /**
  * 撤销删除环型双向链表实现
+ * <p></p>
+ * T为要存储的数据
  *
  * @author LiGuangMin
  * @email lgm@meitu.com
@@ -53,6 +55,26 @@ public class UndoRedoManager<T> {
      */
     public T redo() {
         return getNextNode();
+    }
+
+    /**
+     * 删除链表所有数据
+     */
+    public void removeAll() {
+        if (mHead == null) {
+            return;
+        }
+        Node cur = mHead;
+        while (cur != mHead.mPrevious) {
+            Node dest = cur;
+            cur = cur.mNext;
+
+            dest.mNext = null;
+            dest.mPrevious = null;
+        }
+        mHead = null;
+        mTail = null;
+        mCurrentNode = null;
     }
 
     /**
@@ -143,7 +165,7 @@ public class UndoRedoManager<T> {
     }
 
     private T getNextNode() {
-        if(mTail == null){
+        if (mTail == null) {
             return null;
         }
         if (isRightBound()) {

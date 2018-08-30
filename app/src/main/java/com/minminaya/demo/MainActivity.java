@@ -2,11 +2,14 @@ package com.minminaya.demo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -15,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mLeftBtn;
     private Button mPutBtn;
     private Button mRightBtn;
+    private Button mDeleteBtn;
     private TextView mStateTv;
     private UndoRedoLinkList<String> mUndoRedoLinkList;
 
@@ -32,9 +36,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mRightBtn = findViewById(R.id.btn_right);
         mInputEt = findViewById(R.id.et_input);
         mStateTv = findViewById(R.id.tv_state);
+        mDeleteBtn = findViewById(R.id.btn_delete_all);
         mLeftBtn.setOnClickListener(this);
         mPutBtn.setOnClickListener(this);
         mRightBtn.setOnClickListener(this);
+        mDeleteBtn.setOnClickListener(this);
         mUndoRedoLinkList = new UndoRedoLinkList<>(null);
     }
 
@@ -56,6 +62,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mStateTv.setText(str);
                 mUndoRedoLinkList.put(str);
                 Log.d(TAG, "btn_put: ");
+                break;
+            }
+            case R.id.btn_delete_all: {
+                mUndoRedoLinkList.removeAll();
                 break;
             }
         }
