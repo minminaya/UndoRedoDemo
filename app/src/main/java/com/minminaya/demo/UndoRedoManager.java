@@ -125,6 +125,9 @@ public class UndoRedoManager<T> {
     }
 
     private T getPreNode() {
+        if (mHead == null) {
+            return null;
+        }
         if (isLeftBound()) {
             // 如果是左边界
             return mHead.mData;
@@ -134,6 +137,9 @@ public class UndoRedoManager<T> {
     }
 
     private T getNextNode() {
+        if (mTail == null) {
+            return null;
+        }
         if (isRightBound()) {
             // 如果是右边界
             return mTail.mData;
