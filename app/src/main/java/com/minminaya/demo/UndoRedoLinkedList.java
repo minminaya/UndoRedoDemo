@@ -5,8 +5,6 @@ package com.minminaya.demo;
  * <p></p>
  * T为要存储的数据
  *
- * @author LiGuangMin
- * @email lgm@meitu.com
  * @time Created by 2018/8/29 18:47
  */
 public class UndoRedoLinkedList<T> {

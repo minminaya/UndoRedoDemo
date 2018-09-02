@@ -1,12 +1,10 @@
 package com.minminaya.demo.two;
 
 /**
- * 撤销删除环型双向链表
+ * 撤销删除环型双向链表，既是管理类也是数据结构
  * <p></p>
  * T为要存储的数据
  *
- * @author LiGuangMin
- * @email lgm@meitu.com
  * @time Created by 2018/8/30 13:56
  */
 public class UndoRedoLinkList<T> {
