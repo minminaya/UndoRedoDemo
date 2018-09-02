@@ -9,13 +9,13 @@ package com.minminaya.demo;
  * @email lgm@meitu.com
  * @time Created by 2018/8/29 18:47
  */
-public class UndoRedoManager<T> {
+public class UndoRedoLinkedList<T> {
     // 头结点
-    private Node mHead;
+    private Node<T> mHead;
     // 尾结点
-    private Node mTail;
+    private Node<T> mTail;
     // 当前的显示的节点
-    private Node mCurrentNode;
+    private Node<T> mCurrentNode;
     private int mCount = 5;
 
     /**
@@ -81,7 +81,11 @@ public class UndoRedoManager<T> {
      * 当前的指针头部前移
      */
     private void replaceCurrentHead() {
+        Node<T> node = mHead;
         mHead = mHead.mNext;
+
+        node.mNext = null;
+        node.mPrevious = null;
 
         mTail.mNext = mHead;
         mHead.mPrevious = mTail;
@@ -114,7 +118,7 @@ public class UndoRedoManager<T> {
      * @param data
      */
     private void insertInTail(T data) {
-        Node newNode = new Node(data);
+        Node<T> newNode = new Node<>(data);
         // 保存为当前的节点
         this.mCurrentNode = newNode;
         if (mTail == null) {
@@ -142,10 +146,20 @@ public class UndoRedoManager<T> {
      * @param node
      * @return
      */
-    private void deleteAfterNode(Node node) {
+    private void deleteAfterNode(Node<T> node) {
         if (node == null) {
             return;
         }
+
+        Node<T> cur = node.mNext;
+        while (cur != mHead) {
+            Node<T> dest = cur;
+            cur = cur.mNext;
+
+            dest.mNext = null;
+            dest.mPrevious = null;
+        }
+
         mTail = node;
 
         mTail.mNext = mHead;
@@ -194,11 +208,11 @@ public class UndoRedoManager<T> {
         return mCurrentNode == mTail || mCurrentNode == null;
     }
 
-    private class Node {
+    private static class Node<T> {
         // 业务的数据
         private T mData;
-        private Node mPrevious;
-        private Node mNext;
+        private Node<T> mPrevious;
+        private Node<T> mNext;
 
         Node(T data) {
             mData = data;

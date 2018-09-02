@@ -2,14 +2,11 @@ package com.minminaya.demo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.ArrayMap;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -20,7 +17,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mRightBtn;
     private Button mDeleteBtn;
     private TextView mStateTv;
-    private UndoRedoLinkList<String> mUndoRedoLinkList;
+    private UndoRedoLinkedList<String> mUndoRedoLinkedList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,31 +38,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPutBtn.setOnClickListener(this);
         mRightBtn.setOnClickListener(this);
         mDeleteBtn.setOnClickListener(this);
-        mUndoRedoLinkList = new UndoRedoLinkList<>(null);
+        mUndoRedoLinkedList = new UndoRedoLinkedList<>();
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_left: {
-                String str = mUndoRedoLinkList.undo();
+                String str = mUndoRedoLinkedList.undo();
                 mStateTv.setText(str);
                 break;
             }
             case R.id.btn_right: {
-                String str = mUndoRedoLinkList.redo();
+                String str = mUndoRedoLinkedList.redo();
                 mStateTv.setText(str);
                 break;
             }
             case R.id.btn_put: {
                 final String str = mInputEt.getText().toString();
                 mStateTv.setText(str);
-                mUndoRedoLinkList.put(str);
-                Log.d(TAG, "btn_put: ");
+                mUndoRedoLinkedList.put(str);
                 break;
             }
             case R.id.btn_delete_all: {
-                mUndoRedoLinkList.removeAll();
+                mUndoRedoLinkedList.removeAll();
                 break;
             }
         }
