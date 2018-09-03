@@ -1,5 +1,9 @@
 package com.minminaya.demo.two;
 
+import android.util.Log;
+
+import com.minminaya.demo.bean.UndoRedoBean;
+
 /**
  * 撤销删除环型双向链表，既是管理类也是数据结构
  * <p></p>
@@ -7,24 +11,25 @@ package com.minminaya.demo.two;
  *
  * @time Created by 2018/8/30 13:56
  */
-public class UndoRedoLinkList<T> {
+public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
+    private final static String TAG = UndoRedoLinkedList.class.getSimpleName();
     //头结点
-    private UndoRedoLinkList<T> mHead;
+    private UndoRedoLinkedList<T> mHead;
     //尾结点
-    private UndoRedoLinkList<T> mTail;
+    private UndoRedoLinkedList<T> mTail;
     // 当前的显示的节点
-    private UndoRedoLinkList<T> mCurrentNode;
+    private UndoRedoLinkedList<T> mCurrentNode;
     private int mCount = 5;
 
     //业务的数据
     private T mData;
-    private UndoRedoLinkList<T> mPrevious;
-    private UndoRedoLinkList<T> mNext;
+    private UndoRedoLinkedList<T> mPrevious;
+    private UndoRedoLinkedList<T> mNext;
 
     /**
      * @param data 管理类只需要传入null
      */
-    public UndoRedoLinkList(T data) {
+    public UndoRedoLinkedList(T data) {
         mData = data;
     }
 
@@ -74,10 +79,12 @@ public class UndoRedoLinkList<T> {
         if (mHead == null) {
             return;
         }
-        UndoRedoLinkList<T> cur = mHead;
+        UndoRedoLinkedList<T> cur = mHead;
         while (cur != mHead.mPrevious) {
-            UndoRedoLinkList<T> dest = cur;
+            UndoRedoLinkedList<T> dest = cur;
             cur = cur.mNext;
+
+            dest.mData.onDestroy();
 
             dest.mNext = null;
             dest.mPrevious = null;
@@ -91,7 +98,14 @@ public class UndoRedoLinkList<T> {
      * 当前的指针头部前移
      */
     private void replaceCurrentHead() {
+        UndoRedoLinkedList<T> node = mHead;
+
         mHead = mHead.mNext;
+
+        //头部置空
+        node.mData.onDestroy();
+        node.mNext = null;
+        node.mPrevious = null;
 
         mTail.mNext = mHead;
         mHead.mPrevious = mTail;
@@ -110,7 +124,7 @@ public class UndoRedoLinkList<T> {
         // 尾部有值的情况
         int size = 1;
         // 如果尾部有值，那么开始遍历每一个项
-        UndoRedoLinkList<T> cur = mTail;
+        UndoRedoLinkedList<T> cur = mTail;
         while (cur != mTail.mNext) {
             size++;
             cur = cur.mPrevious;
@@ -124,7 +138,7 @@ public class UndoRedoLinkList<T> {
      * @param data
      */
     private void insertInTail(T data) {
-        UndoRedoLinkList<T> newNode = new UndoRedoLinkList<>(data);
+        UndoRedoLinkedList<T> newNode = new UndoRedoLinkedList<>(data);
         // 保存为当前的节点
         this.mCurrentNode = newNode;
         if (mTail == null) {
@@ -152,12 +166,23 @@ public class UndoRedoLinkList<T> {
      * @param node
      * @return
      */
-    private void deleteAfterNode(UndoRedoLinkList<T> node) {
+    private void deleteAfterNode(UndoRedoLinkedList<T> node) {
         if (node == null) {
             return;
         }
-        mTail = node;
 
+        UndoRedoLinkedList<T> cur = node.mNext;
+        while (cur != mHead) {
+            UndoRedoLinkedList<T> dest = cur;
+            cur = cur.mNext;
+
+            dest.mData.onDestroy();
+
+            dest.mNext = null;
+            dest.mPrevious = null;
+        }
+
+        mTail = node;
         mTail.mNext = mHead;
         mHead.mPrevious = mTail;
     }
@@ -202,5 +227,25 @@ public class UndoRedoLinkList<T> {
      */
     public boolean isRightBound() {
         return mCurrentNode == mTail || mCurrentNode == null;
+    }
+
+    public void showData() {
+        //测试有没有对当前的T中的数据进行删除
+//        mCurrentNode.mData.onDestroy();
+        UndoRedoLinkedList<T> node = mHead;
+        for (; ; ) {
+            if (node == null) {
+                return;
+            }
+            Log.d(TAG, "数据data：" + ((UndoRedoBean) node.mData).getData() + "，index：" + ((UndoRedoBean) node.mData).getIndex());
+            node = node.mNext;
+            if (node == mHead) {
+                return;
+            }
+        }
+    }
+
+    public interface Entry {
+        void onDestroy();
     }
 }

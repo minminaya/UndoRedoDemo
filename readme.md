@@ -268,8 +268,3 @@ private T getPreNode() {
 ![1.gif](https://upload-images.jianshu.io/upload_images/3515789-f7209039da033845.gif?imageMogr2/auto-orient/strip)
 
 
-
------
-
-
-源代码 https://github.com/minminaya/UndoRedoDemo

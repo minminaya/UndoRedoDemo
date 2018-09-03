@@ -44,6 +44,7 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/et_input"
         android:text="右" />
+
     <Button
         android:id="@+id/btn_delete_all"
         android:layout_width="wrap_content"
@@ -51,5 +52,13 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/btn_right"
         android:text="all-delete" />
+
+    <Button
+        android:id="@+id/btn_show_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/btn_delete_all"
+        android:text="show_data" />
 
 </RelativeLayout>
