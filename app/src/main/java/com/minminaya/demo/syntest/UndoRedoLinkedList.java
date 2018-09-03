@@ -1,30 +1,38 @@
-package com.minminaya.demo.two;
+package com.minminaya.demo.syntest;
 
 import android.util.Log;
 
-import com.minminaya.demo.bean.UndoRedoBean;
+import java.io.Serializable;
 
 /**
- * 撤销删除环型双向链表，既是管理类也是数据结构
+ * 撤销删除环型双向链表，既是管理类也是数据结构（Synchronize 关键字）
+ * <p>
  * <p></p>
+ * 测试版本
+ * <p></p>
+ * <p>
  * T为要存储的数据
  *
  * @time Created by 2018/8/30 13:56
  */
-public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
+public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> implements Serializable {
     private final static String TAG = UndoRedoLinkedList.class.getSimpleName();
+
+    private static final long serialVersionUID = -276760562121245410L;
     //头结点
     private UndoRedoLinkedList<T> mHead;
     //尾结点
     private UndoRedoLinkedList<T> mTail;
     // 当前的显示的节点
-    private UndoRedoLinkedList<T> mCurrentNode;
-    private int mCount = 5;
+    private volatile UndoRedoLinkedList<T> mCurrentNode;
+    private volatile int mCount = 30;
 
     //业务的数据
     private T mData;
-    private UndoRedoLinkedList<T> mPrevious;
-    private UndoRedoLinkedList<T> mNext;
+    private volatile UndoRedoLinkedList<T> mPrevious;
+    private volatile UndoRedoLinkedList<T> mNext;
+
+    private int mIndex = 0;
 
     /**
      * @param data 管理类只需要传入null
@@ -43,15 +51,27 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
     }
 
     public void put(T data) {
-        deleteAfterNode(mCurrentNode);
-        if (size() >= mCount) {
+        synchronized (UndoRedoLinkedList.this) {
+            deleteAfterNode(mCurrentNode);
+            //判断有没有已存在node下，则将当前数据移动到尾部
+//        moveToTail(data);
+            if (size() >= mCount) {
+                insertInTail(data);
+                //当前的头部前移
+                replaceCurrentHead();
+                return;
+            }
+            //执行插入
             insertInTail(data);
-            //当前的头部前移
-            replaceCurrentHead();
-            return;
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            Log.d(TAG, "当前线程：" + Thread.currentThread().getName() + "，index:" + (mIndex++));
         }
-        //执行插入
-        insertInTail(data);
     }
 
     /**
@@ -59,7 +79,7 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
      *
      * @return
      */
-    public T undo() {
+    public synchronized T undo() {
         return getPreNode();
     }
 
@@ -68,14 +88,14 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
      *
      * @return
      */
-    public T redo() {
+    public synchronized T redo() {
         return getNextNode();
     }
 
     /**
      * 删除链表所有数据
      */
-    public void removeAll() {
+    public synchronized void removeAll() {
         if (mHead == null) {
             return;
         }
@@ -93,6 +113,56 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
         mTail = null;
         mCurrentNode = null;
     }
+
+//    /** 注释原因：不会存在相同节点情况,此移动到尾部方法多余
+//     * 移动到尾部
+//     *
+//     * @param data
+//     */
+//    @Deprecated
+//    private void moveToTail(T data) {
+//        UndoRedoLinkedList<T> node = new UndoRedoLinkedList<>(data);
+//        if (checkEqualNode(node)) {
+//            //将移动点的节点前后两个节点互相连接
+//            UndoRedoLinkedList<T> preNode = node.mPrevious;
+//            UndoRedoLinkedList<T> nextNode = node.mNext;
+//            preNode.mNext = nextNode;
+//            nextNode.mPrevious = preNode;
+//
+//            //当前移动节点移动到尾部
+//            mTail.mNext = node;
+//            node.mPrevious = mTail;
+//            mTail = node;
+//
+//            //头尾相连接
+//            mTail.mNext = mHead;
+//            mHead.mPrevious = mTail;
+//        }
+//    }
+
+//    /** 注释原因：不会存在相同节点情况
+//     * 遍历链表，判断有没有相同的节点存在
+//     *
+//     * @param newNode
+//     * @return false 说明不存在相同的节点，true说明存在相同的节点
+//     */
+//    private boolean checkEqualNode(UndoRedoLinkedList newNode) {
+//        if (mHead == null) {
+//            return false;
+//        }
+//        UndoRedoLinkedList<T> node = mHead;
+//        for (; ; ) {
+//            if (newNode == node) {
+//                //找到同节点则返回true
+//                return true;
+//            }
+//            node = node.mNext;
+//            if (node == mHead) {
+//                //遍历完没有找到则返回false
+//                return false;
+//            }
+//        }
+//    }
 
     /**
      * 当前的指针头部前移
@@ -116,7 +186,7 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
      *
      * @return
      */
-    private int size() {
+    private synchronized int size() {
         if (mTail == null) {
             // 如果尾部没有值，那么size为0
             return 0;
@@ -187,7 +257,7 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
         mHead.mPrevious = mTail;
     }
 
-    private T getPreNode() {
+    private synchronized T getPreNode() {
         if (mHead == null) {
             return null;
         }
@@ -196,10 +266,20 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
             return mHead.mData;
         }
         mCurrentNode = mCurrentNode.mPrevious;
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Log.d(TAG, "当前线程：" + Thread.currentThread().getName() + "，向左的index:" + (mIndex--));
+
         return mCurrentNode.mData;
     }
 
-    private T getNextNode() {
+    private synchronized T getNextNode() {
+
         if (mTail == null) {
             return null;
         }
@@ -208,6 +288,14 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
             return mTail.mData;
         }
         mCurrentNode = mCurrentNode.mNext;
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, "当前线程：" + Thread.currentThread().getName() + "，向右的index:" + (mIndex++));
+
         return mCurrentNode.mData;
     }
 
@@ -216,7 +304,7 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
      *
      * @return false代表是左边界
      */
-    public boolean isLeftBound() {
+    public synchronized boolean isLeftBound() {
         return mCurrentNode == mHead || mCurrentNode == null;
     }
 
@@ -225,7 +313,7 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
      *
      * @return true代表是右边界
      */
-    public boolean isRightBound() {
+    public synchronized boolean isRightBound() {
         return mCurrentNode == mTail || mCurrentNode == null;
     }
 
@@ -237,7 +325,8 @@ public class UndoRedoLinkedList<T extends UndoRedoLinkedList.Entry> {
             if (node == null) {
                 return;
             }
-            Log.d(TAG, "数据data：" + ((UndoRedoBean) node.mData).getData() + "，index：" + ((UndoRedoBean) node.mData).getIndex());
+//            Log.d(TAG, "当前线程：" + Thread.currentThread().getName());
+//            Log.d(TAG, "数据data：" + ((UndoRedoBean) node.mData).getData() + "，index：" + ((UndoRedoBean) node.mData).getIndex());
             node = node.mNext;
             if (node == mHead) {
                 return;

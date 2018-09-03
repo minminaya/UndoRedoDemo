@@ -1,6 +1,7 @@
 package com.minminaya.demo.bean;
 
-import com.minminaya.demo.two.UndoRedoLinkedList;
+
+import com.minminaya.demo.syntest.UndoRedoLinkedList;
 
 public class UndoRedoBean implements UndoRedoLinkedList.Entry {
 

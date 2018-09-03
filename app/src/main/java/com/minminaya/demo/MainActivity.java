@@ -8,7 +8,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.minminaya.demo.bean.UndoRedoBean;
-import com.minminaya.demo.two.UndoRedoLinkedList;
+import com.minminaya.demo.syntest.UndoRedoLinkedList;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
     }
 
     @Override
@@ -51,29 +52,120 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_left: {
-                UndoRedoBean undoRedoBean = mUndoRedoLinkedList.undo();
-                if (undoRedoBean != null) {
-                    String str = undoRedoBean.getData();
-                    mStateTv.setText(str);
-                }
+//                UndoRedoBean undoRedoBean = mUndoRedoLinkedList.undo();
+//                if (undoRedoBean != null) {
+//                    String str = undoRedoBean.getData();
+//                    mStateTv.setText(str);
+//                }
+
+
+                //多线程测试
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 10; i++) {
+                            mUndoRedoLinkedList.undo();
+                        }
+                    }
+                }).start();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 10; i++) {
+                            mUndoRedoLinkedList.undo();
+                        }
+                    }
+                }).start();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 10; i++) {
+                            mUndoRedoLinkedList.undo();
+                        }
+                    }
+                }).start();
+
+
                 break;
             }
             case R.id.btn_right: {
-                UndoRedoBean undoRedoBean = mUndoRedoLinkedList.redo();
-                if (undoRedoBean != null) {
-                    String str = undoRedoBean.getData();
-                    mStateTv.setText(str);
-                }
+//                UndoRedoBean undoRedoBean = mUndoRedoLinkedList.redo();
+//                if (undoRedoBean != null) {
+//                    String str = undoRedoBean.getData();
+//                    mStateTv.setText(str);
+//                }
+
+                //多线程测试
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 10; i++) {
+                            mUndoRedoLinkedList.redo();
+                        }
+                    }
+                }).start();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 10; i++) {
+                            mUndoRedoLinkedList.redo();
+                        }
+                    }
+                }).start();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 10; i++) {
+                            mUndoRedoLinkedList.redo();
+                        }
+                    }
+                }).start();
+
                 break;
             }
             case R.id.btn_put: {
+                //多线程测试
                 final String str = mInputEt.getText().toString();
                 mStateTv.setText(str);
-
-                UndoRedoBean undoRedoBean = new UndoRedoBean();
+                final UndoRedoBean undoRedoBean = new UndoRedoBean();
                 undoRedoBean.setData(str);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 10; i++) {
+                            undoRedoBean.setData(str);
+                            mUndoRedoLinkedList.put(undoRedoBean);
+                        }
+                    }
+                }).start();
 
-                mUndoRedoLinkedList.put(undoRedoBean);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 10; i++) {
+                            undoRedoBean.setData(str);
+                            mUndoRedoLinkedList.put(undoRedoBean);
+                        }
+                    }
+                }).start();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 10; i++) {
+                            undoRedoBean.setData(str);
+                            mUndoRedoLinkedList.put(undoRedoBean);
+                        }
+                    }
+                }).start();
+
+//                String str = mInputEt.getText().toString();
+//                mStateTv.setText(str);
+//                UndoRedoBean undoRedoBean = new UndoRedoBean();
+//                undoRedoBean.setData(str);
+//                mUndoRedoLinkedList.put(undoRedoBean);
                 break;
             }
             case R.id.btn_delete_all: {
